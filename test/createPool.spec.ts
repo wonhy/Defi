@@ -29,6 +29,8 @@ describe('CreatePoolTest', () => {
     let poolAddress
     let uniswapV3Pool
     let amount0, amount1
+    let testUniswapV3CalleeFactory
+    let testUniswapV3Callee
 
     before(async() => {
         [deployer, user] = await ethers.getSigners()
@@ -65,36 +67,40 @@ describe('CreatePoolTest', () => {
         console.log("tick spacing: ", await uniswapV3Pool.tickSpacing())
 
         // function mint(
+        //     address pool,
         //     address recipient,
         //     int24 tickLower,
         //     int24 tickUpper,
-        //     uint128 amount,
-        //     bytes calldata data
-        // ) external override lock returns (uint256 amount0, uint256 amount1)
+        //     uint128 amount
+        // ) external {
+        //     IUniswapV3Pool(pool).mint(recipient, tickLower, tickUpper, amount, abi.encode(msg.sender));
+        // }
 
-        let poolKey:Object
-        poolKey = {
-            token0: tokenA.address,
-            token1: tokenB.address,
-            fee: 10000
-        }
-        let mintCallBackData: Object
-        mintCallBackData = {
-            poolKey: poolKey,
-            payer: deployer.address
-        }
-
-        //const abiCoder = ethers.utils.defaultAbiCoder
-        //const abi = [mintCallBackData]
+        testUniswapV3CalleeFactory = await ethers.getContractFactory("TestUniswapV3Callee")
+        testUniswapV3Callee = await testUniswapV3CalleeFactory.deploy()
+        await tokenA.approve(testUniswapV3Callee.address, ethers.constants.MaxUint256)
+        await tokenB.approve(testUniswapV3Callee.address, ethers.constants.MaxUint256)
+        await testUniswapV3Callee.mint(poolAddress, deployer.address, -400, 400, toUnit(100))
 
 
-        const data = ethers.utils.defaultAbiCoder.encode(["tuple(tuple(address, address, uint24), address)"], [[[tokenA.address, tokenB.address, 10000], deployer.address]])
-        console.log(data)
+        // let poolKey:Object
+        // poolKey = {
+        //     token0: tokenA.address,
+        //     token1: tokenB.address,
+        //     fee: 10000
+        // }
+        // let mintCallBackData: Object
+        // mintCallBackData = {
+        //     poolKey: poolKey,
+        //     payer: deployer.address
+        // }
+
+
+        // const data = ethers.utils.defaultAbiCoder.encode(["tuple(tuple(address, address, uint24), address)"], [[[tokenA.address, tokenB.address, 10000], deployer.address]])
+        // console.log(data)
         
 
-        await uniswapV3Pool.mint(deployer.address, -400, 400, toUnit(100), data)
-
-        //object == struct
+        // await uniswapV3Pool.mint(deployer.address, -400, 400, toUnit(100), data)
 
 
     })
