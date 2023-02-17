@@ -7,6 +7,14 @@ export default {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: false,
+      forking: {
+        url: 'https://cloudflare-eth.com'
+      },
+      accounts: {
+        mnemonic: 'test test test test test test test test test test test junk',
+        initialIndex: 0,
+        accountsBalance: '10000000000000000000000000' // 10,000,000 ETH
+      },
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
